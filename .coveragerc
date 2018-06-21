@@ -1,0 +1,6 @@
+[run]
+branch = true
+source = ./gimme
+omit =
+    gimme/app.py
+    gimme/__init__.py

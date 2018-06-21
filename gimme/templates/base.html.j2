@@ -1,0 +1,59 @@
+{#
+# Copyright 2018 Spotify AB
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gimme!</title>
+    <link href="//cdn.muicss.com/mui-0.9.39/css/mui.min.css" rel="stylesheet" type="text/css" />
+    <script src="//cdn.muicss.com/mui-0.9.39/js/mui.min.js"></script>
+    <style>
+    .full-width {
+       width: 100%;
+    }
+    footer {
+      box-sizing: border-box;
+      height: 100px;
+      padding-top: 45px;
+    }
+    </style>
+  </head>
+  <body>
+    <header class="mui-appbar mui--z1 mui--bg-accent">
+      <nav class="mui-container-fluid">
+        <table width="100%" cellspacing="0">
+        <tbody>
+          <tr class="mui--appbar-height">
+            <td class="mui--text-title"><a class="mui--text-white" href="{{url_for('ui.index')}}">Gimme</a></td>
+            <td class="mui--text-right"><a class="mui-btn mui-btn--raised" href="{{url_for('ui.logout')}}">Logout</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </nav>
+    </header>
+    <div id="content" class="mui-container">
+      {% block content %}{% endblock content %}
+    </div>
+    <div class="mui-row">&nbsp;</div>
+    <footer class="mui--bg-accent mui--text-white">
+      <div class="mui-container mui--text-center">
+        <strong>Gimme</strong> is made with 💖 by Spotify's Security teams. The source code is licensed
+        <a class="mui--text-white" href="https://opensource.org/licenses/Apache-2.0">Apache 2.0</a>.
+      </div>
+    </footer>
+  </body>
+</html>

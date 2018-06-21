@@ -1,0 +1,27 @@
+{#
+# Copyright 2018 Spotify AB
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#}
+{% extends "base.html.j2" %}
+
+{% block content %}
+<div class="mui-row">
+    <div class="mui-col-sm-8 mui-col-sm-offset-2">
+        <h1>That's not quite right!</h1>
+        <p>It looks like the credentials you're logged in with don't
+        grant you access to this application. Sorry.</p>
+        <p>You can &nbsp;<a class="mui-btn mui-btn--accent mui-btn--raised" href="{{url_for('ui.logout')}}">logout</a>&nbsp; and try again.</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{#
+# Copyright 2018 Spotify AB
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#}
+{% extends "base.html.j2" %}
+{% from 'macros.j2' import render_select_field, render_input_field %}
+
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="mui-row">&nbsp;</div>
+<div class="mui-row messages">
+    {% for category, message in messages %}
+    {% if category == 'error' %}
+    <div class="mui-panel mui--bg-danger mui--text-white">
+    {% else %}
+    <div class="mui-panel">
+    {% endif %}
+        {{ message }}
+    {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+
+<form method="POST" action="/" class="mui-form">
+<div class="mui-row">
+    <div class="mui-col-sm-8 mui-col-sm-offset-2">
+        <h1>Grant access</h1>
+        {{ form.csrf_token }}
+        {{render_select_field("I want to grant", form.access)}}
+        {{render_select_field("For a period of", form.period)}}
+        {{render_input_field("On project", form.project)}}
+        <div class="mui-form--inline">
+            {{render_input_field("To", form.target)}}
+            {{render_select_field("In domain", form.domain, show_label=false)}}
+        </div>
+    </div>
+</div>
+<div class="mui-row">&nbsp;</div>
+<div class="mui-row">
+    <div class="mui-col-sm-8 mui-col-sm-offset-2">
+        <div class="mui-panel">
+            <b>About the project field:</b>
+            <ul>
+                <li>You have to fill in a Google Cloud project ID.</li>
+                <li>You can also paste the Cloud Console URL of the project and we'll get
+                    the information out of it.</li>
+                <li>You cannot request org or folder level access, only project level.</li>
+            </ul>
+            <b>Please note that:</b>
+            <ul>
+                <li>You can only grant access for a limited amount of time. For example
+                    in the case of an emergency or because you want someone to help
+                    you troubleshoot an issue. Access is automatically revoked. If they
+                    need permanent access to a resource to do their job, add them to the
+                    necessary groups instead.</li>
+                <li>You must have the necessary rights on the target resource to
+                    grant them the requested level of access. This usually means you need
+                    to be at least an Editor or have been granted the right to modify that
+                    resource's IAM policy.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="mui-row">
+    <div class="mui-col-sm-8 mui-col-sm-offset-2">
+        <button type="submit" class="full-width mui-btn mui-btn--accent mui-btn--raised">I understand. Make it so!</button>
+    </div>
+</div>
+</form>
+{% endblock content %}
