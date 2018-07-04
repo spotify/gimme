@@ -66,16 +66,27 @@ def login_required(google):
             if not google.authorized:
                 return redirect(url_for('google.login'))
 
-            if not all(key in session for key in ['domain']):
+            if not all(key in session for key in ['domain', 'account']):
                 resp = google.get('/plus/v1/people/me')
                 if resp.status_code != 200:
                     return render_template('sorry.html.j2'), 403
                 body = resp.json()
                 if body.get('domain', None) is not None:
                     session['domain'] = body['domain']
+                else:
+                    return render_template('sorry.html.j2'), 403
+                if body.get('emails', None) is not None:
+                    for email in body['emails']:
+                        if email['type'] == 'account':
+                            session['account'] = email['value']
+                            break
+                    else:
+                        return render_template('sorry.html.j2'), 403
+                else:
+                    return render_template('sorry.html.j2'), 403
 
             if check_valid_domain(
-                session.get('domain', ''),
+                session['domain'],
                 current_app.config.get('ALLOWED_GSUITE_DOMAINS', []),
             ):
                 return func(*args, **kwargs)

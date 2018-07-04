@@ -43,10 +43,50 @@ def test_incomplete_loggedin(incomplete_loggedin_app):
     """Test that we fetch the necessary profile attributes."""
     responses.add(responses.GET,
                   'https://www.googleapis.com/plus/v1/people/me',
-                  status=200, json={'domain': 'example.com'})
+                  status=200, json={
+                      'domain': 'example.com',
+                      'emails': [
+                          {
+                              'value': 'test@example.org',
+                              'type': 'home',
+                          },
+                          {
+                              'value': 'test@example.com',
+                              'type': 'account',
+                          },
+                      ]})
     res = incomplete_loggedin_app.get('/')
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 200
+
+
+@responses.activate
+def test_incomplete_profile_email_account(incomplete_loggedin_app):
+    """Test that we fetch the necessary profile attributes."""
+    responses.add(responses.GET,
+                  'https://www.googleapis.com/plus/v1/people/me',
+                  status=200, json={
+                      'domain': 'example.com',
+                      'emails': [
+                          {
+                              'value': 'test@example.org',
+                              'type': 'home',
+                          },
+                      ]})
+    res = incomplete_loggedin_app.get('/')
+    assert res.content_type == 'text/html; charset=utf-8'
+    assert res.status_code == 403
+
+
+@responses.activate
+def test_incomplete_profile_email_missing(incomplete_loggedin_app):
+    """Test that we fetch the necessary profile attributes."""
+    responses.add(responses.GET,
+                  'https://www.googleapis.com/plus/v1/people/me',
+                  status=200, json={'domain': 'example.com'})
+    res = incomplete_loggedin_app.get('/')
+    assert res.content_type == 'text/html; charset=utf-8'
+    assert res.status_code == 403
 
 
 @responses.activate

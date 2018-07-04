@@ -39,6 +39,7 @@ def loggedin_app(app):
     with app.test_client() as client:
         with client.session_transaction() as sess:
             sess['domain'] = 'example.com'
+            sess['account'] = 'test@example.com'
             sess['google_oauth_token'] = {
                 'access_token': 'tenarsotenarsoetinars',
                 'id_token': 'sotieanrsoietnarst',
@@ -56,6 +57,7 @@ def invalid_loggedin_app(app):
     with app.test_client() as client:
         with client.session_transaction() as sess:
             sess['domain'] = 'example.org'
+            sess['account'] = 'test@example.org'
             sess['google_oauth_token'] = {
                 'access_token': 'tenarsotenarsoetinars',
                 'id_token': 'sotieanrsoietnarst',
