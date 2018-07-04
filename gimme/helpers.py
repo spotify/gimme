@@ -67,31 +67,18 @@ def login_required(google):
                 return redirect(url_for('google.login'))
 
             if not all(key in session for key in ['domain', 'account']):
-                resp = google.get('/plus/v1/people/me')
+                resp = google.get('/userinfo/v2/me')
                 if resp.status_code != 200:
                     flash('Could not get your profile information from Google',
                           'error')
                     return render_template('sorry.html.j2'), 403
                 body = resp.json()
-                if body.get('domain', None) is not None:
-                    session['domain'] = body['domain']
-                else:
-                    flash(('The response from the Google Plus API is missing '
-                           'a required field: domain'), 'error')
+                if not all(v in body.keys() for v in ['hd', 'email']):
+                    flash(('Incomplete profile information was returned by '
+                           'Google'), 'error')
                     return render_template('sorry.html.j2'), 403
-                if body.get('emails', None) is not None:
-                    for email in body['emails']:
-                        if email['type'] == 'account':
-                            session['account'] = email['value']
-                            break
-                    else:
-                        flash(('The response from the Google Plus API did not '
-                               'include an email of type: account'), 'error')
-                        return render_template('sorry.html.j2'), 403
-                else:
-                    flash(('The response from the Google Plus API is missing '
-                           'a required field: emails'), 'error')
-                    return render_template('sorry.html.j2'), 403
+                session['domain'] = body['hd']
+                session['account'] = body['email']
 
             if check_valid_domain(
                 session['domain'],

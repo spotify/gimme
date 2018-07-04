@@ -44,78 +44,42 @@ def test_invalid_logged_in(invalid_loggedin_app):
 def test_incomplete_loggedin(incomplete_loggedin_app):
     """Test that we fetch the necessary profile attributes."""
     responses.add(responses.GET,
-                  'https://www.googleapis.com/plus/v1/people/me',
+                  'https://www.googleapis.com/userinfo/v2/me',
                   status=200, json={
-                      'domain': 'example.com',
-                      'emails': [
-                          {
-                              'value': 'test@example.org',
-                              'type': 'home',
-                          },
-                          {
-                              'value': 'test@example.com',
-                              'type': 'account',
-                          },
-                      ]})
+                      'hd': 'example.com',
+                      'email': 'test@example.com',
+                  })
     res = incomplete_loggedin_app.get('/')
+    assert len(responses.calls) == 1
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 200
-
-
-@responses.activate
-def test_incomplete_profile_email_account(incomplete_loggedin_app):
-    """Test that we fetch the necessary profile attributes."""
-    responses.add(responses.GET,
-                  'https://www.googleapis.com/plus/v1/people/me',
-                  status=200, json={
-                      'domain': 'example.com',
-                      'emails': [
-                          {
-                              'value': 'test@example.org',
-                              'type': 'home',
-                          },
-                      ]})
-    res = incomplete_loggedin_app.get('/')
-    assert res.content_type == 'text/html; charset=utf-8'
-    assert res.status_code == 403
-    assert 'did not include an email of type: account' in \
-        res.get_data(as_text=True).lower()
-
-
-@responses.activate
-def test_incomplete_profile_email_missing(incomplete_loggedin_app):
-    """Test that we fetch the necessary profile attributes."""
-    responses.add(responses.GET,
-                  'https://www.googleapis.com/plus/v1/people/me',
-                  status=200, json={'domain': 'example.com'})
-    res = incomplete_loggedin_app.get('/')
-    assert res.content_type == 'text/html; charset=utf-8'
-    assert res.status_code == 403
-    assert 'is missing a required field: emails' in \
-        res.get_data(as_text=True).lower()
 
 
 @responses.activate
 def test_incomplete_loggedin_profile_failed(incomplete_loggedin_app):
     """Test that access is denied when profile cannot be fetched."""
     responses.add(responses.GET,
-                  'https://www.googleapis.com/plus/v1/people/me',
+                  'https://www.googleapis.com/userinfo/v2/me',
                   status=404)
     res = incomplete_loggedin_app.get('/')
+    assert len(responses.calls) == 1
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 403
+    assert 'could not get your profile information' in \
+        res.get_data(as_text=True).lower()
 
 
 @responses.activate
 def test_incomplete_loggedin_domain_missing(incomplete_loggedin_app):
     """Test that access is denied when profile response is incomplete."""
     responses.add(responses.GET,
-                  'https://www.googleapis.com/plus/v1/people/me',
+                  'https://www.googleapis.com/userinfo/v2/me',
                   status=200, json={})
     res = incomplete_loggedin_app.get('/')
+    assert len(responses.calls) == 1
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 403
-    assert 'is missing a required field: domain' in \
+    assert 'incomplete profile information' in \
         res.get_data(as_text=True).lower()
 
 
@@ -124,8 +88,6 @@ def test_simple_get(loggedin_app):
     res = loggedin_app.get('/')
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 200
-    print(res.data)
-    print(type(res.data))
     assert '<div class="mui-row messages">' not in \
         res.get_data(as_text=True).lower()
 
