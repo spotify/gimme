@@ -132,6 +132,7 @@ def add_conditional_binding(google, form):
     new_policy['policy']['bindings'].append(
         {'condition': {
             'expression': 'request.time < timestamp("{}")'.format(expiry),
+            'description': 'This is a temporary grant created by Gimme',
             'title': 'granted by {}'.format(session['account'])},
          'members': ['user:{}@{}'.format(form.target.data,
                                          form.domain.data)],

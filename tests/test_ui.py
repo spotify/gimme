@@ -149,6 +149,8 @@ def test_valid_post(loggedin_app):
     assert 'policy' in responses.calls[1].request.body.decode('utf-8').lower()
     assert 'granted by test@example.com' in \
         responses.calls[1].request.body.decode('utf-8').lower()
+    assert 'this is a temporary grant' in \
+        responses.calls[1].request.body.decode('utf-8').lower()
     assert 'great success' in res.get_data(as_text=True).lower()
 
 
