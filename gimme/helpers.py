@@ -135,7 +135,7 @@ def add_conditional_binding(google, form):
     new_policy['policy']['bindings'].append(
         {'condition': {
             'expression': 'request.time < timestamp("{}")'.format(expiry),
-            'title': 'awesome'},
+            'title': 'granted by {}'.format(session['account'])},
          'members': ['user:{}@{}'.format(form.target.data,
                                          form.domain.data)],
          'role': form.access.data})

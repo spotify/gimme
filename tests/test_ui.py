@@ -164,41 +164,7 @@ def test_valid_post(loggedin_app):
         })
 
     url = '{}/{}:setIamPolicy'.format(CLOUD_RM, 'test')
-    responses.add(
-        responses.POST, url, status=200,
-        json={
-            'bindings': [
-                {
-                    'role': 'roles/owner',
-                    'members': [
-                        'user:test@exmaple.com',
-                        'user:test2@example.com',
-                    ],
-                },
-                {
-                    'role': 'roles/storage.admin',
-                    'condition': {
-                        'expression': 'request.time < timestamp(\'2018-05-04T00:00:00.00+00:00\')',  # noqa: E501
-                        'title': 'testing',
-                    },
-                    'members': [
-                        'user:test3@example.com',
-                    ],
-                },
-                {
-                    'role': 'roles/storage.admin',
-                    'condition': {
-                        'expression': 'request.time < timestamp(\'2018-05-04T00:15:00.00+00:00\')',  # noqa: E501
-                        'title': 'testing',
-                    },
-                    'members': [
-                        'user:test4@example.com',
-                    ],
-                },
-            ],
-            'version': 1,
-            'etag': 'test',
-        })
+    responses.add(responses.POST, url, status=200)
 
     res = loggedin_app.post('/', data=form, follow_redirects=True)
     assert res.status_code == 200
@@ -210,6 +176,9 @@ def test_valid_post(loggedin_app):
     assert responses.calls[1].request.method == 'POST'
     assert responses.calls[1].request.url == '{}/{}:setIamPolicy'.format(
         CLOUD_RM, 'test')
+    assert 'policy' in responses.calls[1].request.body.decode('utf-8').lower()
+    assert 'granted by test@example.com' in \
+        responses.calls[1].request.body.decode('utf-8').lower()
     assert 'great success' in res.get_data(as_text=True).lower()
 
 
