@@ -17,23 +17,6 @@
 {% from 'macros.j2' import render_select_field, render_input_field %}
 
 {% block content %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-<div class="mui-row">&nbsp;</div>
-<div class="mui-row messages">
-    {% for category, message in messages %}
-    {% if category == 'error' %}
-    <div class="mui-panel mui--bg-danger mui--text-white">
-    {% else %}
-    <div class="mui-panel">
-    {% endif %}
-        {{ message }}
-    {% endfor %}
-    </div>
-</div>
-{% endif %}
-{% endwith %}
-
 <form method="POST" action="/" class="mui-form">
 <div class="mui-row">
     <div class="mui-col-sm-8 mui-col-sm-offset-2">

@@ -46,6 +46,22 @@
       </nav>
     </header>
     <div id="content" class="mui-container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="mui-row">&nbsp;</div>
+      <div class="mui-row messages">
+          {% for category, message in messages %}
+          {% if category == 'error' %}
+          <div class="mui-panel mui--bg-danger mui--text-white">
+          {% else %}
+          <div class="mui-panel">
+          {% endif %}
+              {{ message }}
+          {% endfor %}
+          </div>
+      </div>
+      {% endif %}
+      {% endwith %}
       {% block content %}{% endblock content %}
     </div>
     <div class="mui-row">&nbsp;</div>
