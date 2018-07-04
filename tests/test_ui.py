@@ -36,6 +36,8 @@ def test_invalid_logged_in(invalid_loggedin_app):
     """Test that we don't allow sessions from a non-whitelisted domain."""
     res = invalid_loggedin_app.get('/')
     assert res.status_code == 403
+    assert 'does not match the configured whitelist' in \
+        res.get_data(as_text=True).lower()
 
 
 @responses.activate
@@ -76,6 +78,8 @@ def test_incomplete_profile_email_account(incomplete_loggedin_app):
     res = incomplete_loggedin_app.get('/')
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 403
+    assert 'did not include an email of type: account' in \
+        res.get_data(as_text=True).lower()
 
 
 @responses.activate
@@ -87,6 +91,8 @@ def test_incomplete_profile_email_missing(incomplete_loggedin_app):
     res = incomplete_loggedin_app.get('/')
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 403
+    assert 'is missing a required field: emails' in \
+        res.get_data(as_text=True).lower()
 
 
 @responses.activate
@@ -94,7 +100,7 @@ def test_incomplete_loggedin_profile_failed(incomplete_loggedin_app):
     """Test that access is denied when profile cannot be fetched."""
     responses.add(responses.GET,
                   'https://www.googleapis.com/plus/v1/people/me',
-                  status=404, json={'domain': 'example.com'})
+                  status=404)
     res = incomplete_loggedin_app.get('/')
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 403
@@ -109,6 +115,8 @@ def test_incomplete_loggedin_domain_missing(incomplete_loggedin_app):
     res = incomplete_loggedin_app.get('/')
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 403
+    assert 'is missing a required field: domain' in \
+        res.get_data(as_text=True).lower()
 
 
 def test_simple_get(loggedin_app):
