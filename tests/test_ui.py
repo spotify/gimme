@@ -17,7 +17,6 @@
 """Test the UI."""
 from __future__ import absolute_import, print_function, unicode_literals
 
-import pytest
 import responses
 
 from gimme.helpers import CLOUD_RM
@@ -93,7 +92,6 @@ def test_simple_get(loggedin_app):
 
 
 @responses.activate
-@pytest.mark.freeze_time('2018-05-04')
 def test_valid_post(loggedin_app):
     """Test we behave as expected when the form is filled out correctly."""
     form = {
@@ -179,7 +177,6 @@ def test_valid_post_token_expired(loggedin_app, freezer):
 
 
 @responses.activate
-@pytest.mark.freeze_time('2018-05-04')
 def test_post_invalid_project_url(loggedin_app):
     """Test we bail out when an unparsable URL gets posted in the form."""
     form = {
@@ -199,7 +196,6 @@ def test_post_invalid_project_url(loggedin_app):
 
 
 @responses.activate
-@pytest.mark.freeze_time('2018-05-04')
 def test_valid_post_failed_get_policy(loggedin_app):
     """Test that we inform the user when we can't fetch the policy."""
     form = {
@@ -226,7 +222,6 @@ def test_valid_post_failed_get_policy(loggedin_app):
 
 
 @responses.activate
-@pytest.mark.freeze_time('2018-05-04')
 def test_valid_post_failed_set_policy(loggedin_app):
     """Test that we inform the user when updating the policy fails."""
     form = {
