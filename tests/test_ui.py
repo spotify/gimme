@@ -155,6 +155,30 @@ def test_valid_post(loggedin_app):
 
 
 @responses.activate
+def test_valid_post_token_expired(loggedin_app, freezer):
+    """Test we behave as expected when the form is filled out correctly."""
+    freezer.move_to('2018-05-05')
+    form = {
+        'project': 'test',
+        'access': 'roles/compute.instanceAdmin',
+        'period': '15',
+        'target': 'test4',
+        'domain': 'example.com',
+        'csrf_token': 'not validated in tests',
+    }
+    responses.add(
+        responses.POST, 'https://accounts.google.com/o/oauth2/token',
+        status=400,
+        json={
+            'error_description': 'Missing required parameter: refresh_token',
+            'error': 'invalid_request'})
+    res = loggedin_app.post('/', data=form)
+    assert res.status_code == 302
+    assert ('you should be redirected automatically to target url: '
+            '<a href="/">/</a>.') in res.get_data(as_text=True).lower()
+
+
+@responses.activate
 @pytest.mark.freeze_time('2018-05-04')
 def test_post_invalid_project_url(loggedin_app):
     """Test we bail out when an unparsable URL gets posted in the form."""
