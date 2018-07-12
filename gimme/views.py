@@ -80,7 +80,6 @@ def token_expired(_):
     already given consent, they won't actually have to do anything,
     they'll just find themselves back on the home page.
     """
-
     del current_app.blueprints['google'].token
     flash('Your session had expired. Please submit the request again',
           'error')
