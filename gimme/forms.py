@@ -67,4 +67,5 @@ class RequestForm(FlaskForm):
     domain = fields.SelectField(
         label='domain',
         description='domain of the target',
+        validators=[validators.DataRequired()],
     )
