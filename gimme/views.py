@@ -56,7 +56,8 @@ def logout():
     try:
         google.get(
             'https://accounts.google.com/o/oauth2/revoke',
-            params={'token': current_app.blueprints['google'].token},
+            params={'token':
+                    current_app.blueprints['google'].token['access_token']},
         )
     except InvalidClientIdError:
         # Our OAuth session apparently expired. We could renew the token
