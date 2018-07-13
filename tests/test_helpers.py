@@ -31,7 +31,10 @@ from gimme.helpers import UTC, check_valid_domain, project_from_field
     (('example.com', ['example.com', 'example.example.com']), True),
 ])
 def test_check_valid_domain(tinput, texpected):
-    """Test check_valid_domain."""
+    """Test check_valid_domain.
+
+    Ensure that only whitelisted domains are allowed access.
+    """
     assert check_valid_domain(tinput[0], tinput[1]) is texpected
 
 
@@ -48,7 +51,11 @@ def test_check_valid_domain(tinput, texpected):
     ('test;evil%har#hackers@', 'test%3Bevil%25har%23hackers%40'),
 ])
 def test_check_project_from_field(tinput, texpected):
-    """Test project_from_field."""
+    """Test project_from_field.
+
+    Attempt to parse the project from the given input string.
+    Ensure that we always return URL-safe strings.
+    """
     assert project_from_field(tinput) == texpected
 
 

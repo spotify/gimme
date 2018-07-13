@@ -23,7 +23,11 @@ from gimme.helpers import CLOUD_RM
 
 
 def test_not_logged_in(app):
-    """Test that we redirect to Google for login."""
+    """Test what happens when we're not logged in.
+
+    Ensure we trigger the OAuth flow if we don't have a valid
+    session.
+    """
     res = app.test_client().get('/')
     assert ('You should be redirected automatically to target URL: <a href'
             '="/login/google">/login/google</a>').lower() in \
@@ -32,7 +36,10 @@ def test_not_logged_in(app):
 
 
 def test_invalid_logged_in(invalid_loggedin_app):
-    """Test that we don't allow sessions from a non-whitelisted domain."""
+    """Test what happens when someone comes from a non-whitelisted domain.
+
+    Ensure that we deny them access.
+    """
     res = invalid_loggedin_app.get('/')
     assert res.status_code == 403
     assert 'does not match the configured whitelist' in \
@@ -41,7 +48,11 @@ def test_invalid_logged_in(invalid_loggedin_app):
 
 @responses.activate
 def test_incomplete_loggedin(incomplete_loggedin_app):
-    """Test that we fetch the necessary profile attributes."""
+    """Test what happens when there's a valid session but no profile info.
+
+    Ensure that we call out to the userinfo OAuth endpoint, fetch and
+    store the domain and then grant access.
+    """
     responses.add(responses.GET,
                   'https://www.googleapis.com/userinfo/v2/me',
                   status=200, json={
@@ -56,7 +67,11 @@ def test_incomplete_loggedin(incomplete_loggedin_app):
 
 @responses.activate
 def test_incomplete_loggedin_profile_failed(incomplete_loggedin_app):
-    """Test that access is denied when profile cannot be fetched."""
+    """Test what happens when we have a valid session but can't get profile info.
+
+    Ensures we deny access if the profile endpoint returns anything
+    other than a 200 OK.
+    """
     responses.add(responses.GET,
                   'https://www.googleapis.com/userinfo/v2/me',
                   status=404)
@@ -70,7 +85,12 @@ def test_incomplete_loggedin_profile_failed(incomplete_loggedin_app):
 
 @responses.activate
 def test_incomplete_loggedin_domain_missing(incomplete_loggedin_app):
-    """Test that access is denied when profile response is incomplete."""
+    """Test what happens when the profile response is incomplete.
+
+    Ensure we deny access if the profile endpoint doesn't return all the
+    information we need in order to decide if we should let someone in or
+    not.
+    """
     responses.add(responses.GET,
                   'https://www.googleapis.com/userinfo/v2/me',
                   status=200, json={})
@@ -83,7 +103,10 @@ def test_incomplete_loggedin_domain_missing(incomplete_loggedin_app):
 
 
 def test_simple_get(loggedin_app):
-    """Test the index page renders."""
+    """Test what happens when we satisfy all the prerequisites.
+
+    Ensures we render the index page.
+    """
     res = loggedin_app.get('/')
     assert res.content_type == 'text/html; charset=utf-8'
     assert res.status_code == 200
@@ -93,7 +116,10 @@ def test_simple_get(loggedin_app):
 
 @responses.activate
 def test_valid_post(loggedin_app):
-    """Test we behave as expected when the form is filled out correctly."""
+    """Test what happens when a form is submitted with correct data.
+
+    Ensures we set the new IAM policy on the target project.
+    """
     form = {
         'project': 'test',
         'access': 'roles/compute.instanceAdmin',
@@ -154,7 +180,11 @@ def test_valid_post(loggedin_app):
 
 @responses.activate
 def test_valid_post_token_expired(loggedin_app, freezer):
-    """Test we behave as expected when the form is filled out correctly."""
+    """Test what happens when we try to set a policy but our token has expiredy.
+
+    Ensures the error handler catches the token expiry and retriggers the OAuth
+    flow to get a new token.
+    """
     freezer.move_to('2018-05-05')
     form = {
         'project': 'test',
@@ -178,7 +208,11 @@ def test_valid_post_token_expired(loggedin_app, freezer):
 
 @responses.activate
 def test_post_invalid_project_url(loggedin_app):
-    """Test we bail out when an unparsable URL gets posted in the form."""
+    """Test what happens when we submit an invalid project URL.
+
+    Ensures that we inform the user the information they provided is
+    incorrect. This should never call the Cloud Resource Manager.
+    """
     form = {
         'project': 'https://console.cloud.google.com/?test=test',
         'access': 'roles/compute.instanceAdmin',
@@ -197,7 +231,14 @@ def test_post_invalid_project_url(loggedin_app):
 
 @responses.activate
 def test_valid_post_failed_get_policy(loggedin_app):
-    """Test that we inform the user when we can't fetch the policy."""
+    """Test what happens when we can't fetch the IAM Policy.
+
+    Ensures we inform the user when the policy could not be fetched.
+    This usually means the poject name was incorrect or that they
+    don't have access to said project.
+
+    This must never trigger a call to setIamPolicy.
+    """
     form = {
         'project': 'test',
         'access': 'roles/compute.instanceAdmin',
@@ -223,7 +264,13 @@ def test_valid_post_failed_get_policy(loggedin_app):
 
 @responses.activate
 def test_valid_post_failed_set_policy(loggedin_app):
-    """Test that we inform the user when updating the policy fails."""
+    """Test what happens when we fail to set the policy.
+
+    Ensures that we inform the user when we fail to set the new IAM policy,
+    i.e the permissions aren't granted. This can happen if the user has
+    viewer rights for example, and therefore can view the IAM policy, but
+    lacks the permissions to update it.
+    """
     form = {
         'project': 'test',
         'access': 'roles/compute.instanceAdmin',
@@ -285,12 +332,13 @@ def test_valid_post_failed_set_policy(loggedin_app):
 
 @responses.activate
 def test_logout(loggedin_app):
-    """Test we revoke the token and clear the session."""
+    """Test what happens when we logout the user.
+
+    Ensures we revoke the token and clear the session, which will trigger the
+    OAuth flow again.
+    """
     responses.add(responses.GET, 'https://accounts.google.com/o/oauth2/revoke',
                   status=200)
-    res = loggedin_app.get('/')
-    assert res.content_type == 'text/html; charset=utf-8'
-    assert res.status_code == 200
 
     res = loggedin_app.get('/logout')
     assert len(responses.calls) == 1
