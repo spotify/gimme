@@ -367,3 +367,31 @@ def test_logout_expired_token(loggedin_app, freezer):
     assert ('You should be redirected automatically to target URL: <a href'
             '="/">/</a>').lower() in res.get_data(as_text=True).lower()
     assert res.status_code == 302
+
+
+@responses.activate
+def test_logout_invalid_login(invalid_loggedin_app):
+    """Test what happens when an invalid user tries to log out.
+
+    Ensures we revoke the token and clear the session.
+    """
+    responses.add(responses.GET, 'https://accounts.google.com/o/oauth2/revoke',
+                  status=200)
+
+    res = invalid_loggedin_app.get('/logout')
+    assert len(responses.calls) == 1
+    assert ('You should be redirected automatically to target URL: <a href'
+            '="/">/</a>').lower() in res.get_data(as_text=True).lower()
+    assert res.status_code == 302
+
+
+@responses.activate
+def test_logout_not_logged_in(app):
+    """Test what happens when we try to logout if we're not logged in.
+
+    Ensures that we clear the session and redirect.
+    """
+    res = app.test_client().get('/logout')
+    assert ('You should be redirected automatically to target URL: <a href'
+            '="/">/</a>').lower() in res.get_data(as_text=True).lower()
+    assert res.status_code == 302

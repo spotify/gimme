@@ -50,20 +50,21 @@ def index():
 
 
 @ui.route('/logout', methods=['GET'])
-@login_required(google)
 def logout():
     """Revokes token and empties session."""
-    try:
-        google.get(
-            'https://accounts.google.com/o/oauth2/revoke',
-            params={'token':
+    if google.authorized:
+        try:
+            google.get(
+                'https://accounts.google.com/o/oauth2/revoke',
+                params={
+                    'token':
                     current_app.blueprints['google'].token['access_token']},
-        )
-    except InvalidClientIdError:
-        # Our OAuth session apparently expired. We could renew the token
-        # and logout again but that seems a bit silly, so for now fake
-        # it.
-        pass
+            )
+        except InvalidClientIdError:
+            # Our OAuth session apparently expired. We could renew the token
+            # and logout again but that seems a bit silly, so for now fake
+            # it.
+            pass
     session.clear()
     return redirect(url_for('ui.index'))
 
