@@ -57,9 +57,11 @@ the development and testing settings are loaded.
 
 Other important variables are:
 
-* `ALLOWED_GSUITE_DOMAINS=['spotify.com']`: Enforces that the person trying to use
-  the app is logged in with a Google account matching one of the listed domains. If
-  that's not the case, access is denied and all they can do is logout.
+* `GIMME_ALLOWED_GSUITE_DOMAINS=space separtaed list of domains`: Enforces that the
+  person trying to use the app is logged in with a Google account matching one of the
+  listed domains. If that's not the case, access is denied and all they can do is logout.
+  The domain(s) should be the part after the `@` sign in the email address, so
+  `example.com` for example, or `'example.com example.org'`
 * `GOOGLE_OAUTH_CLIENT_ID=<client id>`
 * `GOOGLE_OAUTH_CLIENT_SECRET=<client secret>`
 

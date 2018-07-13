@@ -43,6 +43,25 @@ def test_bool_from_env(tinput, texpected):
     os.environ.clear()
 
 
+@pytest.mark.parametrize("tinput,texpected", [
+    ('', []),
+    ('example.com', ['example.com']),
+    ('example.com example.org', ['example.com', 'example.org']),
+    ('example.com  example.org   example.net  ',
+     ['example.com', 'example.org', 'example.net']),
+    ('@example.com', ['%40example.com']),
+    ('example.com; /bin/bash -c nefarious',
+     ['example.com%3B', '%2Fbin%2Fbash', '-c', 'nefarious']),
+])
+def test_string_list_from_env(tinput, texpected):
+    """Test the string_list_from_env helper."""
+    import os
+    os.environ['GIMME_ALLOWED_GSUITE_DOMAINS'] = tinput.encode('utf-8')
+    assert gimme.settings.string_list_from_env(
+        'GIMME_ALLOWED_GSUITE_DOMAINS') == texpected
+    os.environ.clear()
+
+
 def test_production_config():
     """Production config."""
     app = create_app(gimme.settings.Production)

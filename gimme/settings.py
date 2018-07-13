@@ -18,6 +18,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os
+import urllib
 
 
 def bool_from_env(key):
@@ -35,6 +36,20 @@ def bool_from_env(key):
     return False
 
 
+def string_list_from_env(key):
+    """Fetch an environment variable and return it as a list of strings.
+
+    This will fetch the specified environment variable, split the content
+    based on the space and return it as a list.
+
+    If the environment variable is not found, it will return the empty
+    list.
+    """
+    val = filter(None, os.getenv(key, default='').split(' '))
+    val = [urllib.quote_plus(v) for v in val]
+    return val
+
+
 class Config(object):
     """Base Configuration object.
 
@@ -43,7 +58,8 @@ class Config(object):
     """
 
     TESTING = False
-    ALLOWED_GSUITE_DOMAINS = []
+    ALLOWED_GSUITE_DOMAINS = string_list_from_env(
+        'GIMME_ALLOWED_GSUITE_DOMAINS')
     SECRET_KEY = bytes(os.environ.get('GIMME_SECRET_KEY',
                                       os.urandom(24)))
     GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
@@ -58,7 +74,6 @@ class Production(Config):
     """
 
     PREFERRED_URL_SCHEME = 'https'
-    ALLOWED_GSUITE_DOMAINS = ['spotify.com']
     SESSION_COOKIE_SECURE = True
 
 
@@ -71,7 +86,6 @@ class Development(Config):
     ENV = 'development'  # this also enables debug mode
     DEBUG = True
     PREFERRED_URL_SCHEME = 'http'
-    ALLOWED_GSUITE_DOMAINS = ['spotify.com']
     OAUTHLIB_RELAX_TOKEN_SCOPE = os.environ.get('OAUTHLIB_RELAX_TOKEN_SCOPE')
     OAUTHLIB_INSECURE_TRANSPORT = os.environ.get('OAUTHLIB_INSECURE_TRANSPORT')
     SESSION_COOKIE_SECURE = False
