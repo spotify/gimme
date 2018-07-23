@@ -117,15 +117,16 @@ def add_conditional_binding(google, form):
     if project == '':
         flash('Could not find project ID in provided URL', 'error')
         return
+    set_condition(google, form, project, 'user')
 
+def set_condition(google, form, project, user_or_group):
     url = '{}/{}:getIamPolicy'.format(CLOUD_RM, project)
     cur_policy = google.post(url)
     if cur_policy.status_code != 200:
         flash(('Could not fetch IAM policy for: {}. This likely means the '
-               'project ID was invalid or you do not have access to '
-               'that project.').format(project), 'error')
+            'project ID was invalid or you do not have access to '
+            'that project.').format(project), 'error')
         return
-
     expiry = (datetime.datetime.now(utc) + datetime.timedelta(
         minutes=form.period.data)).isoformat()
     new_policy = {'policy': cur_policy.json()}
@@ -134,12 +135,14 @@ def add_conditional_binding(google, form):
             'expression': 'request.time < timestamp("{}")'.format(expiry),
             'description': 'This is a temporary grant created by Gimme',
             'title': 'granted by {}'.format(session['account'])},
-         'members': ['user:{}@{}'.format(form.target.data,
-                                         form.domain.data)],
-         'role': form.access.data})
+        'members': ['{}:{}@{}'.format(user_or_group, form.target.data,
+                                        form.domain.data)],
+        'role': form.access.data})
     url = '{}/{}:setIamPolicy'.format(CLOUD_RM, project)
     result = google.post(url, json=new_policy)
     if result.status_code != 200:
+        if 'is of type "group"' in result.json()['error']['message']:
+            return set_condition(google, form, project, 'group')
         flash('Could not apply new policy: {}'.format(
             result.json()['error']['message']), 'error')
         return
