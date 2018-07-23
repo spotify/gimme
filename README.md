@@ -31,7 +31,7 @@ around to it yet.
 ## ⚡ Installation
 
 Gimme is a Python 2.7 (b/c App Engine) application. Its dependencies are
-managed by [`pipenv`][pipenv]. You can generate a `requiremnets.txt` with
+managed by [`pipenv`][pipenv]. You can generate a `requirements.txt` with
 `pipenv lock -r`.
 
 Though Gimme can be hosted on App Engine it does not rely on the App Engine
