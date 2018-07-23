@@ -4,6 +4,24 @@
 
 ***
 
+## Table of Contents
+
+- [👮‍♀️ Gimme 👮‍♂️](#️-gimme-️)
+  - [Table of Contents](#table-of-contents)
+  - [ℹ️ About](#ℹ️-about)
+  - [⚕️ Current state](#️-current-state)
+  - [⚡ Installation](#-installation)
+  - [🔧 Configuration](#-configuration)
+  - [🚀 Deploying](#-deploying)
+    - [App Engine Standard](#app-engine-standard)
+    - [Container](#container)
+  - [🚧 Development](#-development)
+  - [💉 Testing](#-testing)
+  - [🤸 Contributing](#-contributing)
+  - [📝 License](#-license)
+
+## ℹ️ About
+
 Gimme's purpose is to allow you to move your organisation to a point where
 people only have the basic permissions they need to do their job. Using
 Gimme anyone can then grant others additional access to resources, for
@@ -197,7 +215,7 @@ This should ensure Flask will now generate URLs with a base of
 ## 🚧 Development
 
 Once you've set the necessary configuration variables in your environment as
-detailed in the Configuration section, you can start the app with:
+detailed in the [Configuration section](#-configuration), you can start the app with:
 
 ```sh
 $ flask run
