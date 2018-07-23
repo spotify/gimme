@@ -1,5 +1,9 @@
 # 👮‍♀️ Gimme 👮‍♂️
 
+![screenshot of the Gimme UI](screenshots/gimme.png "Gimme UI")
+
+***
+
 Gimme's purpose is to allow you to move your organisation to a point where
 people only have the basic permissions they need to do their job. Using
 Gimme anyone can then grant others additional access to resources, for
