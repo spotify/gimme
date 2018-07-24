@@ -43,7 +43,8 @@ def register_blueprints(app):
     app.register_blueprint(ui)
     app.register_blueprint(
         make_google_blueprint(
-            scope=['profile', 'email',
+            scope=['https://www.googleapis.com/auth/userinfo.profile',
+                   'https://www.googleapis.com/auth/userinfo.email',
                    'https://www.googleapis.com/auth/cloud-platform']),
         url_prefix='/login')
     return None
