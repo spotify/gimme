@@ -30,7 +30,8 @@ leverages time bound IAM Conditions to ensure people only gain truly
 temporary extra privileges.
 
 **NOTE**: In order to be able to use Gimme you'll need to have access to
-the alpha of the IAM Conditions Framework in Google Cloud Platform.
+the private beta of the IAM Conditions Framework in Google Cloud Platform.
+You can [sign up for it over here](https://services.google.com/fb/forms/iamconditionsprivatebetasignup/).
 
 Gimme uses OAuth to authenticate users and obtain an access token, which
 it will then use for any action it takes. As such, the person attempting
