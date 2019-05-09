@@ -18,11 +18,13 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import datetime
+import requests
 import urllib
 import urlparse
 from datetime import timedelta, tzinfo
 from functools import wraps
 
+from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from flask import (current_app, flash, redirect, render_template, session,
                    url_for)
 from validators import url
@@ -121,8 +123,10 @@ def add_conditional_binding(google, form):
 
 def set_condition(google, form, project, user_or_group):
     url = '{}/{}:getIamPolicy'.format(CLOUD_RM, project)
-    cur_policy = google.post(url)
-    if cur_policy.status_code != 200:
+    try:
+        cur_policy = google.post(url)
+        cur_policy.raise_for_status()
+    except (OAuth2Error, requests.HTTPError):
         flash(('Could not fetch IAM policy for: {}. This likely means the '
             'project ID was invalid or you do not have access to '
             'that project.').format(project), 'error')
@@ -139,8 +143,10 @@ def set_condition(google, form, project, user_or_group):
                                         form.domain.data)],
         'role': form.access.data})
     url = '{}/{}:setIamPolicy'.format(CLOUD_RM, project)
-    result = google.post(url, json=new_policy)
-    if result.status_code != 200:
+    try:
+        result = google.post(url, json=new_policy)
+        result.raise_for_status()
+    except (OAuth2Error, requests.HTTPError):
         if 'is of type "group"' in result.json()['error']['message']:
             return set_condition(google, form, project, 'group')
         flash('Could not apply new policy: {}'.format(

@@ -455,18 +455,8 @@ def test_logout_expired_token(loggedin_app, freezer):
     token.
     """
     freezer.move_to('2018-05-05')
-    responses.add(
-        responses.POST, 'https://accounts.google.com/o/oauth2/token',
-        status=400,
-        json={
-            'error_description': 'Missing required parameter: refresh_token',
-            'error': 'invalid_request'})
-
-    res = loggedin_app.get('/logout')
-    assert len(responses.calls) == 1
-    assert ('You should be redirected automatically to target URL: <a href'
-            '="/">/</a>').lower() in res.get_data(as_text=True).lower()
-    assert res.status_code == 302
+    loggedin_app.get('/logout')
+    assert len(responses.calls) == 0
 
 
 @responses.activate
