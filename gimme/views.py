@@ -24,7 +24,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from flask import (Blueprint, current_app, flash, redirect, render_template,
                    session, url_for)
 from flask_dance.contrib.google import google
-from oauthlib.oauth2.rfc6749.errors import InvalidClientIdError
+from oauthlib.oauth2.rfc6749.errors import InvalidClientIdError, TokenExpiredError
 
 from gimme.forms import RequestForm
 from gimme.helpers import add_conditional_binding, login_required
@@ -60,6 +60,8 @@ def logout():
                     'token':
                     current_app.blueprints['google'].token['access_token']},
             )
+        except TokenExpiredError:
+            pass
         except InvalidClientIdError:
             # Our OAuth session apparently expired. We could renew the token
             # and logout again but that seems a bit silly, so for now fake
